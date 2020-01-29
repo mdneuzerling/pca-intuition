@@ -1,0 +1,176 @@
+---
+title: "Principal Component Analysis"
+author: "David Neuzerling"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides:
+      ratio: "16:9"
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+options(htmltools.dir.version = FALSE)
+```
+
+class: center, middle
+
+# xaringan
+
+### /ʃaː.'riŋ.ɡan/
+
+Not PowerPoint
+
+---
+class: middle
+
+# Intuitive definition
+
+> PCA can be thought of as fitting a $p$-dimensional ellipsoid to the data, where each axis of the ellipsoid represents a principal component.
+> 
+> - Wikipedia
+
+---
+class: middle
+
+# Doing maths
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">doing math:<br>step 1: relief when your problem reduces to linear algebra <br>step 2: panic when you realize you somehow don&#39;t actually know any linear algebra</p>&mdash; Aleksandra Sobieska (@combinatola) <a href="https://twitter.com/combinatola/status/997147577173925888?ref_src=twsrc%5Etfw">May 17, 2018</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+
+---
+# Linear algebra you forgot in 1st-year uni
+
+--
+
+$$
+\left(\begin{array}{cc} 
+2 & 3 \\\\
+2 & 1
+\end{array}\right) \times
+\left(\begin{array}{c} 
+6 \\\\
+4
+\end{array}\right) = 
+\left(\begin{array}{c} 
+24 \\\\
+16
+\end{array}\right) = 
+4 \left(\begin{array}{c} 
+6 \\\\
+4
+\end{array}\right)
+$$ 
+
+--
+
+$(6, 4)^T$ is an eigenvector of the square matrix.
+
+--
+
+The square matrix makes the eigenvector *bigger*, but it doesn't change its *direction*.
+
+---
+# Linear algebra you forgot in 1st-year uni
+
+* Eigenvectors of real symmetric matrices are real.
+* Eigenvectors of real symmetric matrices are orthogonal to each other.
+* For an $n \times n$ real symmetric matrix, there are $n$ eigenvectors.
+
+---
+# Linking it back to statistics
+
+Covariance matrices are real and symmetric.
+
+```{r diamonds-covariance-matrix}
+diamonds %>% select_if(is.numeric) %>% cov %>% round(1)
+```
+
+---
+# PCA steps
+
+1. Normalise your data
+1. Find your eigenvectors
+1. Drop the eigenvectors with the lowest eigenvalues
+
+---
+# Show me
+
+.pull-left[
+```{r mtcars-scaled}
+mtcars_scaled <- mtcars %>% 
+  select(wt, mpg) %>% 
+  mutate_all(scale)
+```
+
+```{r mtcars-scaled-plot, eval = FALSE}
+mtcars_scaled %>% 
+  ggplot(aes(x = wt, y = mpg)) + 
+  geom_point() + 
+  coord_fixed() + # makes the plot square
+  theme(text = element_text(size = 20)) +
+  ggtitle("Normalised wt and mpg")
+```
+]
+
+.pull-right[
+```{r mtcars-scaled-plot-out, ref.label = "mtcars-scaled-plot", echo = FALSE}
+```
+]
+
+---
+# Show me
+
+```{r mtcars-prcomp}
+PC <- prcomp(~ wt + mpg, data = mtcars_scaled)
+PC
+```
+
+```{r mtcars-pc}
+```
+
+---
+# Show me
+
+```{r geom-arrow, include = FALSE}
+geom_arrow <- function(x_start, x_end, y_start, y_end, scale = 1) {
+  geom_segment(
+    aes(
+      x = x_start,
+      xend = x_end,
+      y = y_start,
+      yend = y_end
+    ),
+    arrow = arrow(length = unit(scale * 0.5, "cm")),
+    col = "red"
+  )
+}
+```
+
+.pull-left[
+```{r extracting-pc-values}
+PC1 <- PC$rotation[,"PC1"]
+PC2 <- PC$rotation[,"PC2"]
+```
+
+```{r mt-cars-scaled-with-pc, eval = FALSE}
+mtcars_scaled %>% 
+  ggplot(aes(x = wt, y = mpg)) + 
+  geom_point() +
+  geom_arrow(
+    x_start = 0, x_end = PC1[["wt"]],
+    y_start = 0, y_end = PC1[["mpg"]]
+  ) +
+  geom_arrow(
+    x_start = 0, x_end = PC2[["wt"]],
+    y_start = 0, y_end = PC2[["mpg"]]
+  ) +
+  theme(text = element_text(size = 20)) +
+  ggtitle("Principal components") +
+  coord_fixed() # makes the plot square
+```
+]
+

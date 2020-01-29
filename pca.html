@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Principal Component Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="David Neuzerling" />
+    <meta name="date" content="2020-01-30" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Principal Component Analysis
+### David Neuzerling
+### 2020-01-30
+
+---
+
+
+
+
+class: center, middle
+
+# xaringan
+
+### /ʃaː.'riŋ.ɡan/
+
+Not PowerPoint
+
+---
+class: middle
+
+# Intuitive definition
+
+&gt; PCA can be thought of as fitting a `\(p\)`-dimensional ellipsoid to the data, where each axis of the ellipsoid represents a principal component.
+&gt; 
+&gt; - Wikipedia
+
+---
+class: middle
+
+# Doing maths
+
+&lt;blockquote class="twitter-tweet"&gt;&lt;p lang="en" dir="ltr"&gt;doing math:&lt;br&gt;step 1: relief when your problem reduces to linear algebra &lt;br&gt;step 2: panic when you realize you somehow don&amp;#39;t actually know any linear algebra&lt;/p&gt;&amp;mdash; Aleksandra Sobieska (@combinatola) &lt;a href="https://twitter.com/combinatola/status/997147577173925888?ref_src=twsrc%5Etfw"&gt;May 17, 2018&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt; 
+
+---
+# Linear algebra you forgot in 1st-year uni
+
+--
+
+$$
+\left(\begin{array}{cc} 
+2 &amp; 3 \\\\
+2 &amp; 1
+\end{array}\right) \times
+\left(\begin{array}{c} 
+6 \\\\
+4
+\end{array}\right) = 
+\left(\begin{array}{c} 
+24 \\\\
+16
+\end{array}\right) = 
+4 \left(\begin{array}{c} 
+6 \\\\
+4
+\end{array}\right)
+$$ 
+
+--
+
+`\((6, 4)^T\)` is an eigenvector of the square matrix.
+
+--
+
+The square matrix makes the eigenvector *bigger*, but it doesn't change its *direction*.
+
+---
+# Linear algebra you forgot in 1st-year uni
+
+* Eigenvectors of real symmetric matrices are real.
+* Eigenvectors of real symmetric matrices are orthogonal to each other.
+* For an `\(n \times n\)` real symmetric matrix, there are `\(n\)` eigenvectors.
+
+---
+# Linking it back to statistics
+
+Covariance matrices are real and symmetric.
+
+
+```r
+diamonds %&gt;% select_if(is.numeric) %&gt;% cov %&gt;% round(1)
+```
+
+```
+##        carat depth  table      price      x      y      z
+## carat    0.2   0.0    0.2     1742.8    0.5    0.5    0.3
+## depth    0.0   2.1   -0.9      -60.9    0.0    0.0    0.1
+## table    0.2  -0.9    5.0     1133.3    0.5    0.5    0.2
+## price 1742.8 -60.9 1133.3 15915629.4 3958.0 3943.3 2424.7
+## x        0.5   0.0    0.5     3958.0    1.3    1.2    0.8
+## y        0.5   0.0    0.5     3943.3    1.2    1.3    0.8
+## z        0.3   0.1    0.2     2424.7    0.8    0.8    0.5
+```
+
+---
+# PCA steps
+
+1. Normalise your data
+1. Find your eigenvectors
+1. Drop the eigenvectors with the lowest eigenvalues
+
+---
+# Show me
+
+.pull-left[
+
+```r
+mtcars_scaled &lt;- mtcars %&gt;% 
+  select(wt, mpg) %&gt;% 
+  mutate_all(scale)
+```
+
+
+```r
+mtcars_scaled %&gt;% 
+  ggplot(aes(x = wt, y = mpg)) + 
+  geom_point() + 
+  coord_fixed() + # makes the plot square
+  theme(text = element_text(size = 20)) +
+  ggtitle("Normalised wt and mpg")
+```
+]
+
+.pull-right[
+![](pca_files/figure-html/mtcars-scaled-plot-out-1.png)&lt;!-- --&gt;
+]
+
+---
+# Show me
+
+
+```r
+PC &lt;- prcomp(~ wt + mpg, data = mtcars_scaled)
+PC
+```
+
+```
+## Standard deviations (1, .., p=2):
+## [1] 1.3666233 0.3637865
+## 
+## Rotation (n x k) = (2 x 2):
+##            PC1       PC2
+## wt   0.7071068 0.7071068
+## mpg -0.7071068 0.7071068
+```
+
+
+
+---
+# Show me
+
+
+
+.pull-left[
+
+```r
+PC1 &lt;- PC$rotation[,"PC1"]
+PC2 &lt;- PC$rotation[,"PC2"]
+```
+
+
+```r
+mtcars_scaled %&gt;% 
+  ggplot(aes(x = wt, y = mpg)) + 
+  geom_point() +
+  geom_arrow(
+    x_start = 0, x_end = PC1[["wt"]],
+    y_start = 0, y_end = PC1[["mpg"]]
+  ) +
+  geom_arrow(
+    x_start = 0, x_end = PC2[["wt"]],
+    y_start = 0, y_end = PC2[["mpg"]]
+  ) +
+  theme(text = element_text(size = 20)) +
+  ggtitle("Principal components") +
+  coord_fixed() # makes the plot square
+```
+]
+
+.pull-right[
+![](pca_files/figure-html/mt-cars-scaled-with-pc-out-1.png)&lt;!-- --&gt;
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": null,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
