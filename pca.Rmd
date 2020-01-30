@@ -122,55 +122,84 @@ mtcars_scaled %>%
 ]
 
 ---
-# Show me
+# Eigenstuff
 
 ```{r mtcars-prcomp}
-PC <- prcomp(~ wt + mpg, data = mtcars_scaled)
-PC
+eigenstuff <- mtcars_scaled %>% select(wt, mpg) %>% cor %>% eigen
+eigenstuff
 ```
 
-```{r mtcars-pc}
+--
+
+```{r extracting-pc-values}
+eigenvector_1 <- eigenstuff$vectors[,1] %>% {c("wt" = .[1], "mpg" = .[2])}
+eigenvalue_1 <- eigenstuff$values[1]
+
+eigenvector_2 <- eigenstuff$vectors[,2] %>% {c("wt" = .[1], "mpg" = .[2])}
+eigenvalue_2 <- eigenstuff$values[2]
 ```
 
 ---
 # Show me
 
 ```{r geom-arrow, include = FALSE}
-geom_arrow <- function(x_start, x_end, y_start, y_end, scale = 1) {
+arrow <- function(x_start = 0, x_end, y_start = 0, y_end, scale = 1) {
   geom_segment(
     aes(
       x = x_start,
-      xend = x_end,
+      xend = x_end * scale,
       y = y_start,
-      yend = y_end
+      yend = y_end * scale
     ),
-    arrow = arrow(length = unit(scale * 0.5, "cm")),
+    arrow = ggplot2::arrow(length = unit(0.5, "cm")),
     col = "red"
   )
 }
 ```
 
 .pull-left[
-```{r extracting-pc-values}
-PC1 <- PC$rotation[,"PC1"]
-PC2 <- PC$rotation[,"PC2"]
-```
-
-```{r mt-cars-scaled-with-pc, eval = FALSE}
+```{r mt-cars-scaled-with-vectors, eval = FALSE}
 mtcars_scaled %>% 
   ggplot(aes(x = wt, y = mpg)) + 
   geom_point() +
-  geom_arrow(
-    x_start = 0, x_end = PC1[["wt"]],
-    y_start = 0, y_end = PC1[["mpg"]]
-  ) +
-  geom_arrow(
-    x_start = 0, x_end = PC2[["wt"]],
-    y_start = 0, y_end = PC2[["mpg"]]
-  ) +
+  arrow(x_end = eigenvector_1[["wt"]],
+        y_end = eigenvector_1[["mpg"]]) +
+  arrow(x_end = eigenvector_2[["wt"]],
+        y_end = eigenvector_2[["mpg"]]) +
   theme(text = element_text(size = 20)) +
   ggtitle("Principal components") +
   coord_fixed() # makes the plot square
+```
+]
+
+.pull-right[
+```{r mt-cars-scaled-with-vectors-out, ref.label = "mt-cars-scaled-with-vectors", echo = FALSE}
+```
+]
+
+---
+
+# Scaling with eigenvalues
+
+.pull-left[
+```{r mt-cars-scaled-with-vectors-and-values, eval = FALSE}
+mtcars_scaled %>% 
+  ggplot(aes(x = wt, y = mpg)) + 
+  geom_point() +
+  arrow(x_end = eigenvector_1[["wt"]],
+        y_end = eigenvector_1[["mpg"]],
+        scale = eigenvalue_1) +
+  arrow(x_end = eigenvector_2[["wt"]],
+        y_end = eigenvector_2[["mpg"]],
+        scale = eigenvalue_2) +
+  theme(text = element_text(size = 20)) +
+  ggtitle("Principal components") +
+  coord_fixed() # makes the plot square
+```
+]
+
+.pull-right[
+```{r mt-cars-scaled-with-vectors-and-eigenvalues-out, ref.label = "mt-cars-scaled-with-vectors-and-values", echo = FALSE}
 ```
 ]
 

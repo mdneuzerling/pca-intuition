@@ -139,25 +139,35 @@ mtcars_scaled %&gt;%
 ]
 
 ---
-# Show me
+# Eigenstuff
 
 
 ```r
-PC &lt;- prcomp(~ wt + mpg, data = mtcars_scaled)
-PC
+eigenstuff &lt;- mtcars_scaled %&gt;% select(wt, mpg) %&gt;% cor %&gt;% eigen
+eigenstuff
 ```
 
 ```
-## Standard deviations (1, .., p=2):
-## [1] 1.3666233 0.3637865
+## eigen() decomposition
+## $values
+## [1] 1.8676594 0.1323406
 ## 
-## Rotation (n x k) = (2 x 2):
-##            PC1       PC2
-## wt   0.7071068 0.7071068
-## mpg -0.7071068 0.7071068
+## $vectors
+##            [,1]       [,2]
+## [1,] -0.7071068 -0.7071068
+## [2,]  0.7071068 -0.7071068
 ```
 
+--
 
+
+```r
+eigenvector_1 &lt;- eigenstuff$vectors[,1] %&gt;% {c("wt" = .[1], "mpg" = .[2])}
+eigenvalue_1 &lt;- eigenstuff$values[1]
+
+eigenvector_2 &lt;- eigenstuff$vectors[,2] %&gt;% {c("wt" = .[1], "mpg" = .[2])}
+eigenvalue_2 &lt;- eigenstuff$values[2]
+```
 
 ---
 # Show me
@@ -167,23 +177,13 @@ PC
 .pull-left[
 
 ```r
-PC1 &lt;- PC$rotation[,"PC1"]
-PC2 &lt;- PC$rotation[,"PC2"]
-```
-
-
-```r
 mtcars_scaled %&gt;% 
   ggplot(aes(x = wt, y = mpg)) + 
   geom_point() +
-  geom_arrow(
-    x_start = 0, x_end = PC1[["wt"]],
-    y_start = 0, y_end = PC1[["mpg"]]
-  ) +
-  geom_arrow(
-    x_start = 0, x_end = PC2[["wt"]],
-    y_start = 0, y_end = PC2[["mpg"]]
-  ) +
+  arrow(x_end = eigenvector_1[["wt"]],
+        y_end = eigenvector_1[["mpg"]]) +
+  arrow(x_end = eigenvector_2[["wt"]],
+        y_end = eigenvector_2[["mpg"]]) +
   theme(text = element_text(size = 20)) +
   ggtitle("Principal components") +
   coord_fixed() # makes the plot square
@@ -191,7 +191,33 @@ mtcars_scaled %&gt;%
 ]
 
 .pull-right[
-![](pca_files/figure-html/mt-cars-scaled-with-pc-out-1.png)&lt;!-- --&gt;
+![](pca_files/figure-html/mt-cars-scaled-with-vectors-out-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Scaling with eigenvalues
+
+.pull-left[
+
+```r
+mtcars_scaled %&gt;% 
+  ggplot(aes(x = wt, y = mpg)) + 
+  geom_point() +
+  arrow(x_end = eigenvector_1[["wt"]],
+        y_end = eigenvector_1[["mpg"]],
+        scale = eigenvalue_1) +
+  arrow(x_end = eigenvector_2[["wt"]],
+        y_end = eigenvector_2[["mpg"]],
+        scale = eigenvalue_2) +
+  theme(text = element_text(size = 20)) +
+  ggtitle("Principal components") +
+  coord_fixed() # makes the plot square
+```
+]
+
+.pull-right[
+![](pca_files/figure-html/mt-cars-scaled-with-vectors-and-eigenvalues-out-1.png)&lt;!-- --&gt;
 ]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
