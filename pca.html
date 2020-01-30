@@ -105,6 +105,8 @@ diamonds %&gt;% select_if(is.numeric) %&gt;% cov %&gt;% round(1)
 ---
 # Show me
 
+
+
 .pull-left[
 
 ```r
@@ -115,18 +117,8 @@ mtcars_scaled &lt;- mtcars %&gt;%
 
 
 ```r
-square_ggplot &lt;- function(data) {
-  ggplot(data, aes(x = wt, y = mpg)) + 
-  geom_point() + 
-  xlim(c(-2.5, 2.5)) +
-  ylim(c(-2.5, 2.5)) +
-  coord_fixed() + # makes the plot square
-  theme(text = element_text(size = 20))
-}
-```
-
-
-```r
+# square_ggplot is a helper function
+# that uses ggplot2
 mtcars_scaled %&gt;% square_ggplot
 ```
 ]
@@ -251,7 +243,7 @@ as.matrix(mtcars_scaled) %*% # dot product
   eigenstuff$vectors %&gt;% 
   data.frame %&gt;% 
   setNames(c("wt", "mpg")) %&gt;% 
-  square_ggplot
+  square_ggplot(pc_labels = TRUE)
 ```
 ]
 
@@ -276,7 +268,7 @@ as.matrix(mtcars_scaled) %*% # dot product
   eigenstuff$vectors %&gt;% 
   data.frame %&gt;% 
   setNames(c("wt", "mpg")) %&gt;% 
-  square_ggplot +
+  square_ggplot(pc_labels = TRUE) +
   geom_segment(aes(x = wt, y = mpg,
                    xend = wt, yend = 0),
                colour = "blue")
@@ -306,7 +298,7 @@ as.matrix(mtcars_scaled) %*%
         c(0, 0)) %&gt;% 
   data.frame %&gt;% 
   setNames(c("wt", "mpg")) %&gt;% 
-  square_ggplot
+  square_ggplot(pc_labels = TRUE)
 ```
 ]
 
