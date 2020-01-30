@@ -351,6 +351,15 @@ as.matrix(mtcars_scaled) %*%
 .pull-right[
 ![](pca_files/figure-html/transforming-back-out-1.png)&lt;!-- --&gt;
 ]
+
+---
+# In practice
+
+* I've done this the hard way. There are tools for this:
+  * `base::prcomp()`
+  * `from sklearn.decomposition import PCA`
+
+* There's no hard rule for working out _how many_ dimensions to reduce.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

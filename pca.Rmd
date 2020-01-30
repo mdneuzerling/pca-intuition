@@ -337,3 +337,12 @@ as.matrix(mtcars_scaled) %*%
 ```{r transforming-back-out, ref.label = "transforming-back", echo = FALSE, warning = FALSE}
 ```
 ]
+
+---
+# In practice
+
+* I've done this the hard way. There are tools for this:
+  * `base::prcomp()`
+  * `from sklearn.decomposition import PCA`
+
+* There's no hard rule for working out _how many_ dimensions to reduce.
