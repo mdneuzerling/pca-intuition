@@ -251,7 +251,7 @@ as.matrix(mtcars_scaled) %*% # dot product
 
 ---
 
-# Change of basis
+# Dropping a dimension
 
 .pull-left[
 
@@ -261,7 +261,7 @@ as.matrix(mtcars_scaled) %*% # dot product
 \end{align*}
 
 ```{r change-of-basis-with-residuals, eval = FALSE}
-as.matrix(mtcars_scaled) %*% # dot product
+as.matrix(mtcars_scaled) %*%
   eigenstuff$vectors %>% 
   data.frame %>% 
   setNames(c("wt", "mpg")) %>% 
@@ -269,6 +269,11 @@ as.matrix(mtcars_scaled) %*% # dot product
   geom_segment(aes(x = wt, y = mpg,
                    xend = wt, yend = 0),
                colour = "blue")
+```
+
+```{r eigenvalue-reminder}
+eigenvalue_1
+eigenvalue_2 # The smallest, so we drop it
 ```
 ]
 

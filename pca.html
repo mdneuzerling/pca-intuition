@@ -253,7 +253,7 @@ as.matrix(mtcars_scaled) %*% # dot product
 
 ---
 
-# Change of basis
+# Dropping a dimension
 
 .pull-left[
 
@@ -264,7 +264,7 @@ as.matrix(mtcars_scaled) %*% # dot product
 
 
 ```r
-as.matrix(mtcars_scaled) %*% # dot product
+as.matrix(mtcars_scaled) %*%
   eigenstuff$vectors %&gt;% 
   data.frame %&gt;% 
   setNames(c("wt", "mpg")) %&gt;% 
@@ -272,6 +272,23 @@ as.matrix(mtcars_scaled) %*% # dot product
   geom_segment(aes(x = wt, y = mpg,
                    xend = wt, yend = 0),
                colour = "blue")
+```
+
+
+```r
+eigenvalue_1
+```
+
+```
+## [1] 1.867659
+```
+
+```r
+eigenvalue_2 # The smallest, so we drop it
+```
+
+```
+## [1] 0.1323406
 ```
 ]
 
