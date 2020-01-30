@@ -92,7 +92,7 @@ diamonds %>% select_if(is.numeric) %>% cov %>% round(1)
 ```{r square-plot, include = FALSE}
 square_ggplot <- function(data, pc_labels = FALSE) {
   p <- ggplot(data, aes(x = wt, y = mpg)) + 
-  geom_point() + 
+  geom_point(na.rm = TRUE) + 
   xlim(c(-2.5, 2.5)) +
   ylim(c(-2.5, 2.5)) +
   coord_fixed() + # makes the plot square
@@ -261,7 +261,34 @@ as.matrix(mtcars_scaled) %*% # dot product
 \end{align*}
 
 ```{r change-of-basis-with-residuals, eval = FALSE}
-as.matrix(mtcars_scaled) %*%
+as.matrix(mtcars_scaled) %*% # dot product
+  eigenstuff$vectors %>% 
+  data.frame %>% 
+  setNames(c("wt", "mpg")) %>% 
+  square_ggplot(pc_labels = TRUE) +
+  geom_segment(aes(x = wt, y = mpg,
+                   xend = wt, yend = 0),
+               colour = "blue")
+```
+]
+
+.pull-right[
+```{r change-of-basis-with-residuals-out, ref.label = "change-of-basis-with-residuals", echo = FALSE, warning = FALSE}
+```
+]
+
+---
+# Dropping a dimension
+
+.pull-left[
+
+\begin{align*}
+\text{data} \;& \cdot \\
+\text{eigenvector matrix} \;&
+\end{align*}
+
+```{r change-of-basis-with-residuals-2, eval = FALSE}
+as.matrix(mtcars_scaled) %*% # dot product
   eigenstuff$vectors %>% 
   data.frame %>% 
   setNames(c("wt", "mpg")) %>% 
@@ -273,14 +300,15 @@ as.matrix(mtcars_scaled) %*%
 
 ```{r eigenvalue-reminder}
 eigenvalue_1
-eigenvalue_2 # The smallest, so we drop it
+eigenvalue_2
 ```
 ]
 
 .pull-right[
-```{r change-of-basis-with-residuals-out, ref.label = "change-of-basis-with-residuals", echo = FALSE, warning = FALSE}
+```{r change-of-basis-with-residuals-2-out, ref.label = "change-of-basis-with-residuals-2", echo = FALSE, warning = FALSE}
 ```
 ]
+
 
 ---
 
@@ -318,7 +346,7 @@ as.matrix(mtcars_scaled) %*%
 \text{data} \;& \cdot \\
 \text{eigenvector matrix} \;& \cdot \\
 \text{projection matrix} \:& \cdot \\
-\text{inverse eigenvector matrix} \;&
+(\text{eigenvector matrix})^{-1} &
 \end{align*}
 
 ```{r transforming-back, eval = FALSE}

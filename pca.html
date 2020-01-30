@@ -264,7 +264,34 @@ as.matrix(mtcars_scaled) %*% # dot product
 
 
 ```r
-as.matrix(mtcars_scaled) %*%
+as.matrix(mtcars_scaled) %*% # dot product
+  eigenstuff$vectors %&gt;% 
+  data.frame %&gt;% 
+  setNames(c("wt", "mpg")) %&gt;% 
+  square_ggplot(pc_labels = TRUE) +
+  geom_segment(aes(x = wt, y = mpg,
+                   xend = wt, yend = 0),
+               colour = "blue")
+```
+]
+
+.pull-right[
+![](pca_files/figure-html/change-of-basis-with-residuals-out-1.png)&lt;!-- --&gt;
+]
+
+---
+# Dropping a dimension
+
+.pull-left[
+
+`\begin{align*}
+\text{data} \;&amp; \cdot \\
+\text{eigenvector matrix} \;&amp;
+\end{align*}`
+
+
+```r
+as.matrix(mtcars_scaled) %*% # dot product
   eigenstuff$vectors %&gt;% 
   data.frame %&gt;% 
   setNames(c("wt", "mpg")) %&gt;% 
@@ -284,7 +311,7 @@ eigenvalue_1
 ```
 
 ```r
-eigenvalue_2 # The smallest, so we drop it
+eigenvalue_2
 ```
 
 ```
@@ -293,8 +320,9 @@ eigenvalue_2 # The smallest, so we drop it
 ]
 
 .pull-right[
-![](pca_files/figure-html/change-of-basis-with-residuals-out-1.png)&lt;!-- --&gt;
+![](pca_files/figure-html/change-of-basis-with-residuals-2-out-1.png)&lt;!-- --&gt;
 ]
+
 
 ---
 
@@ -332,7 +360,7 @@ as.matrix(mtcars_scaled) %*%
 \text{data} \;&amp; \cdot \\
 \text{eigenvector matrix} \;&amp; \cdot \\
 \text{projection matrix} \:&amp; \cdot \\
-\text{inverse eigenvector matrix} \;&amp;
+(\text{eigenvector matrix})^{-1} &amp;
 \end{align*}`
 
 
