@@ -114,8 +114,7 @@ mtcars_scaled <- mtcars %>%
 ```
 
 ```{r mtcars-scaled-plot, eval = FALSE}
-# square_ggplot is a helper function
-# that uses ggplot2
+# `square_ggplot` is a helper function
 mtcars_scaled %>% square_ggplot
 ```
 ]
