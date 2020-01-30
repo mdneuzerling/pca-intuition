@@ -4,7 +4,7 @@
     <title>Principal Component Analysis</title>
     <meta charset="utf-8" />
     <meta name="author" content="David Neuzerling" />
-    <meta name="date" content="2020-01-30" />
+    <meta name="date" content="2020-01-31" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
   </head>
@@ -14,7 +14,7 @@ class: center, middle, inverse, title-slide
 
 # Principal Component Analysis
 ### David Neuzerling
-### 2020-01-30
+### 2020-01-31
 
 ---
 
@@ -125,12 +125,20 @@ mtcars_scaled &lt;- mtcars %&gt;%
 
 
 ```r
-mtcars_scaled %&gt;% 
-  ggplot(aes(x = wt, y = mpg)) + 
+square_ggplot &lt;- function(data) {
+  ggplot(data, aes(x = wt, y = mpg)) + 
   geom_point() + 
+  xlim(c(-2.5, 2.5)) +
+  ylim(c(-2.5, 2.5)) +
   coord_fixed() + # makes the plot square
-  theme(text = element_text(size = 20)) +
-  ggtitle("Normalised wt and mpg")
+  theme(text = element_text(size = 20))
+}
+```
+
+
+```r
+mtcars_scaled %&gt;% 
+  square_ggplot
 ```
 ]
 
@@ -177,16 +185,11 @@ eigenvalue_2 &lt;- eigenstuff$values[2]
 .pull-left[
 
 ```r
-mtcars_scaled %&gt;% 
-  ggplot(aes(x = wt, y = mpg)) + 
-  geom_point() +
+mtcars_scaled %&gt;% square_ggplot +
   arrow(x_end = eigenvector_1[["wt"]],
         y_end = eigenvector_1[["mpg"]]) +
   arrow(x_end = eigenvector_2[["wt"]],
-        y_end = eigenvector_2[["mpg"]]) +
-  theme(text = element_text(size = 20)) +
-  ggtitle("Principal components") +
-  coord_fixed() # makes the plot square
+        y_end = eigenvector_2[["mpg"]])
 ```
 ]
 
@@ -201,23 +204,116 @@ mtcars_scaled %&gt;%
 .pull-left[
 
 ```r
-mtcars_scaled %&gt;% 
-  ggplot(aes(x = wt, y = mpg)) + 
-  geom_point() +
+mtcars_scaled %&gt;% square_ggplot +
   arrow(x_end = eigenvector_1[["wt"]],
         y_end = eigenvector_1[["mpg"]],
         scale = eigenvalue_1) +
   arrow(x_end = eigenvector_2[["wt"]],
         y_end = eigenvector_2[["mpg"]],
-        scale = eigenvalue_2) +
-  theme(text = element_text(size = 20)) +
-  ggtitle("Principal components") +
-  coord_fixed() # makes the plot square
+        scale = eigenvalue_2)
 ```
 ]
 
 .pull-right[
 ![](pca_files/figure-html/mt-cars-scaled-with-vectors-and-eigenvalues-out-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Original data
+
+.pull-left[
+
+
+```r
+mtcars_scaled %&gt;% 
+  square_ggplot
+```
+]
+
+.pull-right[
+![](pca_files/figure-html/original-data-out-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Change of basis
+
+.pull-left[
+
+`\begin{align*}
+\text{data} \;&amp; \cdot \\
+\text{eigenvector matrix} \;&amp;
+\end{align*}`
+
+
+```r
+as.matrix(mtcars_scaled) %*% # dot product
+  eigenstuff$vectors %&gt;% 
+  data.frame %&gt;% 
+  setNames(c("wt", "mpg")) %&gt;% 
+  square_ggplot
+```
+]
+
+.pull-right[
+![](pca_files/figure-html/change-of-basis-out-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Dropping a dimension
+
+.pull-left[
+`\begin{align*}
+\text{data} \;&amp; \cdot \\
+\text{eigenvector matrix} \;&amp; \cdot \\
+\text{projection matrix} \:&amp;
+\end{align*}`
+
+
+```r
+as.matrix(mtcars_scaled) %*%
+  eigenstuff$vectors %*%
+  rbind(c(1, 0),
+        c(0, 0)) %&gt;% 
+  data.frame %&gt;% 
+  setNames(c("wt", "mpg")) %&gt;% 
+  square_ggplot
+```
+]
+
+.pull-right[
+![](pca_files/figure-html/drop-dimension-out-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Transforming back
+
+.pull-left[
+`\begin{align*}
+\text{data} \;&amp; \cdot \\
+\text{eigenvector matrix} \;&amp; \cdot \\
+\text{projection matrix} \:&amp; \cdot \\
+\text{inverse eigenvector matrix} \;&amp;
+\end{align*}`
+
+
+```r
+as.matrix(mtcars_scaled) %*%
+  eigenstuff$vectors %*%
+  rbind(c(1, 0),
+        c(0, 0))  %*%
+  solve(eigenstuff$vectors) %&gt;% 
+  data.frame %&gt;% 
+  setNames(c("wt", "mpg")) %&gt;% 
+  square_ggplot
+```
+]
+
+.pull-right[
+![](pca_files/figure-html/transforming-back-out-1.png)&lt;!-- --&gt;
 ]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

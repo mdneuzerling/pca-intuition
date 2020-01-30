@@ -106,13 +106,20 @@ mtcars_scaled <- mtcars %>%
   mutate_all(scale)
 ```
 
+```{r square-plot}
+square_ggplot <- function(data) {
+  ggplot(data, aes(x = wt, y = mpg)) + 
+  geom_point() + 
+  xlim(c(-2.5, 2.5)) +
+  ylim(c(-2.5, 2.5)) +
+  coord_fixed() + # makes the plot square
+  theme(text = element_text(size = 20))
+}
+```
+
 ```{r mtcars-scaled-plot, eval = FALSE}
 mtcars_scaled %>% 
-  ggplot(aes(x = wt, y = mpg)) + 
-  geom_point() + 
-  coord_fixed() + # makes the plot square
-  theme(text = element_text(size = 20)) +
-  ggtitle("Normalised wt and mpg")
+  square_ggplot
 ```
 ]
 
@@ -159,16 +166,11 @@ arrow <- function(x_start = 0, x_end, y_start = 0, y_end, scale = 1) {
 
 .pull-left[
 ```{r mt-cars-scaled-with-vectors, eval = FALSE}
-mtcars_scaled %>% 
-  ggplot(aes(x = wt, y = mpg)) + 
-  geom_point() +
+mtcars_scaled %>% square_ggplot +
   arrow(x_end = eigenvector_1[["wt"]],
         y_end = eigenvector_1[["mpg"]]) +
   arrow(x_end = eigenvector_2[["wt"]],
-        y_end = eigenvector_2[["mpg"]]) +
-  theme(text = element_text(size = 20)) +
-  ggtitle("Principal components") +
-  coord_fixed() # makes the plot square
+        y_end = eigenvector_2[["mpg"]])
 ```
 ]
 
@@ -183,18 +185,13 @@ mtcars_scaled %>%
 
 .pull-left[
 ```{r mt-cars-scaled-with-vectors-and-values, eval = FALSE}
-mtcars_scaled %>% 
-  ggplot(aes(x = wt, y = mpg)) + 
-  geom_point() +
+mtcars_scaled %>% square_ggplot +
   arrow(x_end = eigenvector_1[["wt"]],
         y_end = eigenvector_1[["mpg"]],
         scale = eigenvalue_1) +
   arrow(x_end = eigenvector_2[["wt"]],
         y_end = eigenvector_2[["mpg"]],
-        scale = eigenvalue_2) +
-  theme(text = element_text(size = 20)) +
-  ggtitle("Principal components") +
-  coord_fixed() # makes the plot square
+        scale = eigenvalue_2)
 ```
 ]
 
@@ -203,3 +200,100 @@ mtcars_scaled %>%
 ```
 ]
 
+---
+
+# Original data
+
+.pull-left[
+
+```{r original-data, eval = FALSE}
+mtcars_scaled %>% 
+  square_ggplot
+```
+]
+
+.pull-right[
+```{r original-data-out, ref.label = "original-data", echo = FALSE, warning = FALSE}
+```
+]
+
+---
+
+# Change of basis
+
+.pull-left[
+
+\begin{align*}
+\text{data} \;& \cdot \\
+\text{eigenvector matrix} \;&
+\end{align*}
+
+```{r change-of-basis, eval = FALSE}
+as.matrix(mtcars_scaled) %*% # dot product
+  eigenstuff$vectors %>% 
+  data.frame %>% 
+  setNames(c("wt", "mpg")) %>% 
+  square_ggplot
+```
+]
+
+.pull-right[
+```{r change-of-basis-out, ref.label = "change-of-basis", echo = FALSE, warning = FALSE}
+```
+]
+
+---
+
+# Dropping a dimension
+
+.pull-left[
+\begin{align*}
+\text{data} \;& \cdot \\
+\text{eigenvector matrix} \;& \cdot \\
+\text{projection matrix} \:&
+\end{align*}
+
+```{r drop-dimension, eval = FALSE}
+as.matrix(mtcars_scaled) %*%
+  eigenstuff$vectors %*%
+  rbind(c(1, 0),
+        c(0, 0)) %>% 
+  data.frame %>% 
+  setNames(c("wt", "mpg")) %>% 
+  square_ggplot
+```
+]
+
+.pull-right[
+```{r drop-dimension-out, ref.label = "drop-dimension", echo = FALSE, warning = FALSE}
+```
+]
+
+---
+
+# Transforming back
+
+.pull-left[
+\begin{align*}
+\text{data} \;& \cdot \\
+\text{eigenvector matrix} \;& \cdot \\
+\text{projection matrix} \:& \cdot \\
+\text{inverse eigenvector matrix} \;&
+\end{align*}
+
+```{r transforming-back, eval = FALSE}
+as.matrix(mtcars_scaled) %*%
+  eigenstuff$vectors %*%
+  rbind(c(1, 0),
+        c(0, 0))  %*%
+  solve(eigenstuff$vectors) %>% 
+  data.frame %>% 
+  setNames(c("wt", "mpg")) %>% 
+  square_ggplot
+```
+]
+
+.pull-right[
+```{r transforming-back-out, ref.label = "transforming-back", echo = FALSE, warning = FALSE}
+```
+]
