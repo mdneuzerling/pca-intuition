@@ -154,7 +154,7 @@ arrow <- function(x_start = 0, x_end, y_start = 0, y_end, scale = 1) {
       y = y_start,
       yend = y_end * scale
     ),
-    arrow = ggplot2::arrow(length = unit(0.5, "cm")),
+    arrow = ggplot2::arrow(length = unit(0.3, "cm")),
     col = "red"
   )
 }
