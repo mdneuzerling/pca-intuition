@@ -30,7 +30,6 @@ class: center, middle
 Not PowerPoint
 
 ---
-class: middle
 
 # Intuitive definition
 
@@ -39,9 +38,7 @@ class: middle
 &gt; - Wikipedia
 
 ---
-class: middle
-
-# Doing maths
+class: middle, center
 
 &lt;blockquote class="twitter-tweet"&gt;&lt;p lang="en" dir="ltr"&gt;doing math:&lt;br&gt;step 1: relief when your problem reduces to linear algebra &lt;br&gt;step 2: panic when you realize you somehow don&amp;#39;t actually know any linear algebra&lt;/p&gt;&amp;mdash; Aleksandra Sobieska (@combinatola) &lt;a href="https://twitter.com/combinatola/status/997147577173925888?ref_src=twsrc%5Etfw"&gt;May 17, 2018&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt; 
 
@@ -71,7 +68,7 @@ $$
 
 --
 
-`\((6, 4)^T\)` is an eigenvector of the square matrix.
+`\((6, 4)^T\)` is an **eigenvector** of the square matrix, and 4 is its **eigenvalue**.
 
 --
 
@@ -106,13 +103,6 @@ diamonds %&gt;% select_if(is.numeric) %&gt;% cov %&gt;% round(1)
 ```
 
 ---
-# PCA steps
-
-1. Normalise your data
-1. Find your eigenvectors
-1. Drop the eigenvectors with the lowest eigenvalues
-
----
 # Show me
 
 .pull-left[
@@ -137,8 +127,7 @@ square_ggplot &lt;- function(data) {
 
 
 ```r
-mtcars_scaled %&gt;% 
-  square_ggplot
+mtcars_scaled %&gt;% square_ggplot
 ```
 ]
 
@@ -185,6 +174,7 @@ eigenvalue_2 &lt;- eigenstuff$values[2]
 .pull-left[
 
 ```r
+# `arrow` is a helper function
 mtcars_scaled %&gt;% square_ggplot +
   arrow(x_end = eigenvector_1[["wt"]],
         y_end = eigenvector_1[["mpg"]]) +
@@ -217,6 +207,15 @@ mtcars_scaled %&gt;% square_ggplot +
 .pull-right[
 ![](pca_files/figure-html/mt-cars-scaled-with-vectors-and-eigenvalues-out-1.png)&lt;!-- --&gt;
 ]
+
+---
+# PCA steps
+
+1. Normalise your data
+1. Transform with eigenvectors
+1. Drop _some_ eigenvectors with the lowest eigenvalues
+1. Do stuff
+1. Transform back
 
 ---
 
@@ -258,6 +257,34 @@ as.matrix(mtcars_scaled) %*% # dot product
 
 .pull-right[
 ![](pca_files/figure-html/change-of-basis-out-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Change of basis
+
+.pull-left[
+
+`\begin{align*}
+\text{data} \;&amp; \cdot \\
+\text{eigenvector matrix} \;&amp;
+\end{align*}`
+
+
+```r
+as.matrix(mtcars_scaled) %*% # dot product
+  eigenstuff$vectors %&gt;% 
+  data.frame %&gt;% 
+  setNames(c("wt", "mpg")) %&gt;% 
+  square_ggplot +
+  geom_segment(aes(x = wt, y = mpg,
+                   xend = wt, yend = 0),
+               colour = "blue")
+```
+]
+
+.pull-right[
+![](pca_files/figure-html/change-of-basis-with-residuals-out-1.png)&lt;!-- --&gt;
 ]
 
 ---

@@ -26,7 +26,6 @@ class: center, middle
 Not PowerPoint
 
 ---
-class: middle
 
 # Intuitive definition
 
@@ -35,9 +34,7 @@ class: middle
 > - Wikipedia
 
 ---
-class: middle
-
-# Doing maths
+class: middle, center
 
 <blockquote class="twitter-tweet"><p lang="en" dir="ltr">doing math:<br>step 1: relief when your problem reduces to linear algebra <br>step 2: panic when you realize you somehow don&#39;t actually know any linear algebra</p>&mdash; Aleksandra Sobieska (@combinatola) <a href="https://twitter.com/combinatola/status/997147577173925888?ref_src=twsrc%5Etfw">May 17, 2018</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
 
@@ -67,7 +64,7 @@ $$
 
 --
 
-$(6, 4)^T$ is an eigenvector of the square matrix.
+$(6, 4)^T$ is an **eigenvector** of the square matrix, and 4 is its **eigenvalue**.
 
 --
 
@@ -88,13 +85,6 @@ Covariance matrices are real and symmetric.
 ```{r diamonds-covariance-matrix}
 diamonds %>% select_if(is.numeric) %>% cov %>% round(1)
 ```
-
----
-# PCA steps
-
-1. Normalise your data
-1. Find your eigenvectors
-1. Drop the eigenvectors with the lowest eigenvalues
 
 ---
 # Show me
@@ -118,8 +108,7 @@ square_ggplot <- function(data) {
 ```
 
 ```{r mtcars-scaled-plot, eval = FALSE}
-mtcars_scaled %>% 
-  square_ggplot
+mtcars_scaled %>% square_ggplot
 ```
 ]
 
@@ -166,6 +155,7 @@ arrow <- function(x_start = 0, x_end, y_start = 0, y_end, scale = 1) {
 
 .pull-left[
 ```{r mt-cars-scaled-with-vectors, eval = FALSE}
+# `arrow` is a helper function
 mtcars_scaled %>% square_ggplot +
   arrow(x_end = eigenvector_1[["wt"]],
         y_end = eigenvector_1[["mpg"]]) +
@@ -199,6 +189,15 @@ mtcars_scaled %>% square_ggplot +
 ```{r mt-cars-scaled-with-vectors-and-eigenvalues-out, ref.label = "mt-cars-scaled-with-vectors-and-values", echo = FALSE}
 ```
 ]
+
+---
+# PCA steps
+
+1. Normalise your data
+1. Transform with eigenvectors
+1. Drop _some_ eigenvectors with the lowest eigenvalues
+1. Do stuff
+1. Transform back
 
 ---
 
@@ -239,6 +238,34 @@ as.matrix(mtcars_scaled) %*% # dot product
 
 .pull-right[
 ```{r change-of-basis-out, ref.label = "change-of-basis", echo = FALSE, warning = FALSE}
+```
+]
+
+---
+
+# Change of basis
+
+.pull-left[
+
+\begin{align*}
+\text{data} \;& \cdot \\
+\text{eigenvector matrix} \;&
+\end{align*}
+
+```{r change-of-basis-with-residuals, eval = FALSE}
+as.matrix(mtcars_scaled) %*% # dot product
+  eigenstuff$vectors %>% 
+  data.frame %>% 
+  setNames(c("wt", "mpg")) %>% 
+  square_ggplot +
+  geom_segment(aes(x = wt, y = mpg,
+                   xend = wt, yend = 0),
+               colour = "blue")
+```
+]
+
+.pull-right[
+```{r change-of-basis-with-residuals-out, ref.label = "change-of-basis-with-residuals", echo = FALSE, warning = FALSE}
 ```
 ]
 
